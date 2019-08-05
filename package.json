@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "description": "Keep-your-recipes is a web based personal cooking recipes manager.",
   "main": "app.js",
-  "scripts": {
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/raymar9/keep_your_recipes.git"
@@ -16,6 +15,7 @@
   },
   "homepage": "https://github.com/raymar9/keep_your_recipes#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "mongodb": "^3.3.0-beta2"
   }
 }
