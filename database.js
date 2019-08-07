@@ -5,17 +5,20 @@ class MongoDbHandler {
         if (db_name == "") {
             throw Error('Database name is empty');
         }
-        this._url = "mongodb://localhost/" + db_name;
+        this._url = 'mongodb://localhost:27017';
+        this._db_name  = db_name;
         this._client = new MongoClient(this._url, { useNewUrlParser: true });
     }
 
-    connect() {
-        this._client.connect(function(err) {
-            if (err) {
-                throw err;
-            }
-            console.debug("Connected to database");
+    async connect() {
+        let promise = this._client.connect();
+        promise.catch(function(error) { 
+            console.error('Could not connect to database.'); 
+            throw new Error('Could not connect to database. Abort!'); 
         });
+        const client = await promise;
+        console.debug("Connected to mongo database");
+        return client;
     }
 
     close() {
@@ -27,11 +30,11 @@ class MongoDbHandler {
         });
     }
 
-    get db() {
+    get database() {
         if (!this._client.isConnected()) {
             this.connect();
         }
-        return this._client.db;
+        return this._client.db(this._db_name);
     }
 }
 
