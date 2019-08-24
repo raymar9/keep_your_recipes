@@ -6,7 +6,8 @@ const DATABASE_CONFIG = {
 }
 
 const APP_CONFIG = {
-    database_name: 'keep_your_recipes'
+    database_name: 'keep_your_recipes',
+    recipeCollection: 'recipes'
 }
 
 module.exports = {
