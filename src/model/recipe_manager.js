@@ -1,4 +1,4 @@
-const dbHandler = require('../database/db_handler.js');
+const dbHandler = require('../utils/db_handler.js');
 const config = require('../config.js').APP_CONFIG;
 
 function Recipe(title, complexity, tags, ingredients, preparation, image) {

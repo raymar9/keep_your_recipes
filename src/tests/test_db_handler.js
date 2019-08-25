@@ -1,4 +1,4 @@
-const db = require('../database/db_handler.js');
+const db = require('../utils/db_handler.js');
 
 const dbName = 'test_db';
 const collectionName = 'testing';
