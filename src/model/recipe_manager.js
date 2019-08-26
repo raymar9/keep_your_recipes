@@ -1,17 +1,63 @@
 const dbHandler = require('../utils/db_handler.js');
 const config = require('../config.js').APP_CONFIG;
 
-function Recipe(title, complexity, tags, ingredients, preparation, image) {
-    this.title = title;
-    if (complexity > 3) {
-        this.complexity = 3;
-    } else if (complexity < 1) {
-        this.complexity = 1;
+dbHandler.initialize(config.databaseName);
+
+function isString(obj) {
+    return (typeof(obj) == 'string');
+}
+
+function validateTitle(str) {
+    if (!isString(str) || str.length == 0) {
+        throw new Error("Recipe title not valid");
     }
-    this.tags = tags.isArray() ? tags : undefined;
-    this.ingredients = ingredients.isArray() ? ingredients : undefined;
-    this.preparation = preparation;
-    this.image = image;
+    return str;
+}
+
+function validateComplexity(integer) {
+    if ((typeof(integer) != 'number') || (integer > 3 || integer < 1)) {
+        throw new Error("Recipe complexity not valid"); 
+    }
+    return integer;
+}
+
+function validateTags(tags) {
+    if (!Array.isArray(tags)) throw new Error("Recipe tags is not array");
+    let vTags = [];
+    tags.forEach(element => {
+        if (isString(element) && element.length > 0) {
+            let elTrimmed = element.trim();
+            if (!/\s/.test(elTrimmed)) {
+                // no whitespace in tag
+                vTags.push(elTrimmed);
+            }
+        }
+    });
+    return vTags;
+}
+
+function validateIngredients(ingredients) {
+    if (!Array.isArray(ingredients)) throw new Error("Recipe ingredients is not array");
+    let vIngredients = [];
+    ingredients.forEach(element => {
+        let elTrimmed = element.trim();
+        if (!isString(elTrimmed) || elTrimmed.length == 0) {
+            throw new Error("Recipe ingredients has a no string element");
+        }
+        vIngredients.push(elTrimmed);
+    });
+    return vIngredients;
+}
+
+function Recipe(title, complexity, tags, ingredients, preparation, image) {
+    // mandatory properties
+    this.title = validateTitle(title);
+    this.complexity = validateComplexity(complexity);
+    this.tags = validateTags(tags);
+    // optional properties
+    this.ingredients = validateIngredients(ingredients); // must be an array (>= 0 elements)
+    this.preparation = isString(preparation) ? preparation.trim() : undefined;
+    this.image = isString(image) ? image.trim() : undefined;
 }
 
 function addRecipeToDatabase(recipe) {
@@ -41,4 +87,13 @@ async function getOneRecipeFromDatabase(recipeId) {
         throw Error('Could not find a recipe with this ID!');
     }
     return recipeArray[0];
+}
+
+module.exports = {
+    Recipe,
+    addRecipeToDatabase,
+    modifyDatabaseRecipe,
+    removeRecipeFromDatabase,
+    getAllRecipesFromDatabase,
+    getOneRecipeFromDatabase
 }
