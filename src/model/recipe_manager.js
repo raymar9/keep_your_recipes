@@ -1,5 +1,7 @@
 const dbHandler = require('../utils/db_handler.js');
 const config = require('../config.js').APP_CONFIG;
+const MongoDb= require('mongodb');
+
 
 dbHandler.initialize(config.databaseName);
 
@@ -65,11 +67,11 @@ function addRecipeToDatabase(recipe) {
 }
 
 function modifyDatabaseRecipe(recipeId, newRecipe) {
-    return dbHandler.updateEntry({ _id: recipeId }, newRecipe, config.recipeCollection);
+    return dbHandler.updateEntryById(recipeId, newRecipe, config.recipeCollection);
 }
 
 function removeRecipeFromDatabase(recipeId) {
-    return dbHandler.removeEntry({ _id: recipeId }, config.recipeCollection);
+    return dbHandler.removeEntry(recipeId, config.recipeCollection);
 }
 
 function getAllRecipesFromDatabase() {
@@ -77,16 +79,16 @@ function getAllRecipesFromDatabase() {
 }
 
 async function getOneRecipeFromDatabase(recipeId) {
-    let recipeArray;
+    let entry;
     try {
-        recipeArray = await dbHandler.getEntries({ _id: recipeId }, config.recipeCollection);
+        entry = await dbHandler.getEntrybyId(recipeId, config.recipeCollection);
     } catch (error) {
         throw error;
     }
-    if (recipeArray.length < 1) {
+    if (!entry) {
         throw Error('Could not find a recipe with this ID!');
     }
-    return recipeArray[0];
+    return entry;
 }
 
 module.exports = {

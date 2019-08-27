@@ -38,7 +38,18 @@ app.route('/recipes')
             });
     });
 
-    // Update recipe
+// Get a specific recipe
+app.get('/recipes/:recipeId', (req, res) => {
+    console.debug('GET request: get recipe with ID: ' + req.params.recipeId);
+    recipeManager.getOneRecipeFromDatabase(req.params.recipeId)
+        .then((result) => res.json(result))
+        .catch((error) => {
+            console.error(error.message);
+            res.sendStatus(404);
+        });
+});
+
+// Update recipe
 app.put('/recipes/:recipeId', (req, res) => {
     console.debug('PUT request: modify recipe with ID: ' + req.params.recipeId);
     console.debug(JSON.stringify(req.body));

@@ -1,4 +1,5 @@
-const MongoClient = require('mongodb').MongoClient;
+const MongoDb = require('mongodb');
+const MongoClient = MongoDb.MongoClient;
 const config = require('../config.js').DATABASE_CONFIG;
 
 let dbClient_;
@@ -72,15 +73,24 @@ async function getEntries(query, collectionName) {
     }
 }
 
-async function updateEntry(query, newValues, collectionName) {
+async function getEntrybyId(id, collectionName) {
     try {
         let coll = await getCollection_(collectionName);
-        return await coll.updateOne(query, { $set: newValues });
+        return await coll.findOne(MongoDb.ObjectId.createFromHexString(id));
+    } catch (error) {
+        throw Error('Error while getting entry! ' + error.message);
+    }
+}
+
+async function updateEntryById(id, newValues, collectionName) {
+    try {
+        let coll = await getCollection_(collectionName);
+        return await coll.updateOne({_id: MongoDb.ObjectId.createFromHexString(id)}, { $set: newValues });
     } catch (error) {
         throw Error('Error while updating entry! ' + error.message);
     }
 }
 
 module.exports = {
-    initialize, insertEntry, removeEntry, getEntries, updateEntry
+    initialize, insertEntry, removeEntry, getEntries, getEntrybyId, updateEntryById
 }
