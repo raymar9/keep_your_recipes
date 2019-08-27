@@ -77,7 +77,7 @@ async function updateEntry(query, newValues, collectionName) {
         let coll = await getCollection_(collectionName);
         return await coll.updateOne(query, { $set: newValues });
     } catch (error) {
-        throw Error('Error while getting entries! ' + error.message);
+        throw Error('Error while updating entry! ' + error.message);
     }
 }
 

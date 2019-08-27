@@ -13,23 +13,42 @@ app.use(express.static('public'));
 app.use(express.json());
 
 // REST routing
-// GET all recipes
 app.route('/recipes')
-    .get((req, res, next) => {
+    // Get all recipes
+    .get((req, res) => {
         console.debug('GET request: get all recipes');
         recipeManager.getAllRecipesFromDatabase()
             .then((result) => res.json(result))
-            .catch(next);
+            .catch((error) => {
+                console.error(error.message);
+                res.sendStatus(404);
+            });
     })
 
-    .post((req, res, next) => {
+    // Add new recipe
+    .post((req, res) => {
         console.debug('POST request: add new recipe');
         let rB = req.body;
         let newRecipe = new recipeManager.Recipe(rB.title, rB.complexity, rB.tags, rB.ingredients, rB. preparation, rB.image);
         recipeManager.addRecipeToDatabase(newRecipe)
             .then(() => res.sendStatus(201))
-            .catch(next);
-    })
+            .catch((error) => {
+                console.error(error.message);
+                res.sendStatus(404);
+            });
+    });
+
+    // Update recipe
+app.put('/recipes/:recipeId', (req, res) => {
+    console.debug('PUT request: modify recipe with ID: ' + req.params.recipeId);
+    console.debug(JSON.stringify(req.body));
+    recipeManager.modifyDatabaseRecipe(req.params.recipeId, req.body)
+        .then(() => res.sendStatus(200))
+        .catch((error) => {
+            console.error(error.message);
+            res.sendStatus(404);
+        });
+});
 
 // Start backend application by listening on port...
 app.listen(8081);
