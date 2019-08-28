@@ -6,9 +6,15 @@ let dbClient_;
 let dbName_;
 let dbHandle_;
 
+class DbHandlerError extends Error {
+    constructor(message) {
+      super(message);
+      this.name = this.constructor.name;
+    }
+  }
+
 function initialize(dbName) {
     if (dbClient_) {
-        console.warn('Database is already initialized.');
         return;
     }
     dbClient_ = new MongoClient(`mongodb://${config.url}:${config.port}`, { useNewUrlParser: true });
@@ -18,25 +24,18 @@ function initialize(dbName) {
 async function connect() {
     try {
         let client = await dbClient_.connect();
-        if (client.isConnected()) {
-            console.debug('Connected to mongo database.');
-        }
         dbHandle_ = client.db(dbName_);
+        console.debug('Connected to mongo database.');
         return dbHandle_;
-    } catch (error) {
-        throw new Error('Could not connect to mongodb!');
+    } catch (err) {
+        throw new DbHandlerError('Could not connect to mongodb.');
     }
 }
 
 async function getCollection_(collectionName) {
     if (!dbClient_.isConnected() || !dbHandle_) {
-        try {
-            await connect();
-        } catch {
-            throw new Error('Error while connecting to db!');
-        }
+        await connect();
     }
-
     let collPromise = function (collName) {
         return new Promise((resolve, reject) => {
             let cb = function(error, collection) {
@@ -50,26 +49,34 @@ async function getCollection_(collectionName) {
 }
 
 async function insertEntry(entry, collectionName) {
-    return getCollection_(collectionName)
-        .then(coll => coll.insertOne(entry))
-        .then(() => console.debug('Inserted one entry into database.'))
-        .catch(err => { throw new Error('Error while inserting entry! ' + err.message) });
+    try {
+        let coll = await getCollection_(collectionName);
+        await coll.insertOne(entry);
+        console.debug('Inserted a new entry into database.');
+    } catch (err) {
+        console.error('dbHandler InsertError: ' + err.message);
+        throw new DbHandlerError('Could not insert entry.'); 
+    }
 }
 
-async function removeEntry(query, collectionName) {
-    return getCollection_(collectionName)
-        .then(coll => coll.deleteOne(query))
-        .then(() => console.debug('Removed one entry from database.'))
-        .catch(err => {throw new Error('Error while deleting entry! ' + err.message)})
+async function removeEntrybyId(id, collectionName) {
+    try {
+        let coll = await getCollection_(collectionName);
+        await coll.deleteOne(MongoDb.ObjectId.createFromHexString(id));
+        console.debug('Removed an entry from database.');
+    } catch (err) {
+        console.error('dbHandler RemoveError: ' + err.message);
+        throw new DbHandlerError('Could not remove entry.');
+    }
 }
 
 async function getEntries(query, collectionName) {
     try {
         let coll = await getCollection_(collectionName);
-        let docs = await coll.find(query).toArray();
-        return docs;
-    } catch (error) {
-        throw Error('Error while getting entries! ' + error.message);
+        return await coll.find(query).toArray();
+    } catch (err) {
+        console.error('dbHandler GettingError: ' + err.message);
+        throw new DbHandlerError('Could not get entries.');
     }
 }
 
@@ -77,20 +84,27 @@ async function getEntrybyId(id, collectionName) {
     try {
         let coll = await getCollection_(collectionName);
         return await coll.findOne(MongoDb.ObjectId.createFromHexString(id));
-    } catch (error) {
-        throw Error('Error while getting entry! ' + error.message);
+    } catch (err) {
+        console.error('dbHandler GettingByIdError: ' + err.message);
+        throw new DbHandlerError('Could not get entry by id.');
     }
 }
 
 async function updateEntryById(id, newValues, collectionName) {
     try {
         let coll = await getCollection_(collectionName);
-        return await coll.updateOne({_id: MongoDb.ObjectId.createFromHexString(id)}, { $set: newValues });
-    } catch (error) {
-        throw Error('Error while updating entry! ' + error.message);
+        let result = await coll.updateOne({_id: MongoDb.ObjectId.createFromHexString(id)}, { $set: newValues });
+        if (result.matchedCount != 1) {
+            console.warn(`dbHandler UpdateWarning: ${result.matchedCount} have been updated.`);
+        } else {
+            console.debug('One entry has been updated in database.');
+        }
+    } catch (err) {
+        console.error('dbHandler UpdateByIdError: ' + err.message);
+        throw new DbHandlerError('Could not update entry by id.');
     }
 }
 
 module.exports = {
-    initialize, insertEntry, removeEntry, getEntries, getEntrybyId, updateEntryById
+    initialize, insertEntry, removeEntrybyId, getEntries, getEntrybyId, updateEntryById
 }
