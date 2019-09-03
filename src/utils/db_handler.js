@@ -11,7 +11,7 @@ class DbHandlerError extends Error {
       super(message);
       this.name = this.constructor.name;
     }
-  }
+}
 
 function initialize(dbName) {
     if (dbClient_) {
@@ -62,8 +62,12 @@ async function insertEntry(entry, collectionName) {
 async function removeEntrybyId(id, collectionName) {
     try {
         let coll = await getCollection_(collectionName);
-        await coll.deleteOne(MongoDb.ObjectId.createFromHexString(id));
-        console.debug('Removed an entry from database.');
+        let result = await coll.deleteOne(MongoDb.ObjectId.createFromHexString(id));
+        if (result.deletedCount != 1) {
+            console.warn(`dbHandler RemoveWarning: ${result.deletedCount} have been deleted from database.`);
+        } else {
+            console.debug('One entry has been removed from database.');
+        }
     } catch (err) {
         console.error('dbHandler RemoveError: ' + err.message);
         throw new DbHandlerError('Could not remove entry.');
@@ -106,5 +110,11 @@ async function updateEntryById(id, newValues, collectionName) {
 }
 
 module.exports = {
-    initialize, insertEntry, removeEntrybyId, getEntries, getEntrybyId, updateEntryById
+    initialize, 
+    insertEntry, 
+    removeEntrybyId, 
+    getEntries, 
+    getEntrybyId, 
+    updateEntryById,
+    DbHandlerError
 }
