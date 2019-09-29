@@ -1,14 +1,21 @@
 <template>
   <div id="app">
+    <nav class="navbar container"></nav>
+    <header class="container title is-1">Keep Your Recipes</header>
+    <main class="container">
+      <RecipeManager />
+    </main>
+    <footer class="footer container">Footer</footer>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import RecipeManager from './components/RecipeManager.vue'
 
 export default {
   name: 'app',
   components: {
+    RecipeManager
   }
 }
 </script>
