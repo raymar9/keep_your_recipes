@@ -5,6 +5,8 @@
     <div class="modal-card">
       <header class="modal-card-head">
         <p class="modal-card-title">{{ recipe.title }}</p>
+        <a class="icon" v-on:click="$emit('editRecipe')"><i class="oi oi-pencil"></i></a>
+        <a class="icon" v-on:click="$emit('deleteRecipe')"><i class="oi oi-trash"></i></a>
       </header>
       <section class="modal-card-body">
         <div class="tags are-medium">
@@ -29,5 +31,7 @@ export default {
 </script>
 
 <style>
-
+a.icon {
+  margin-left: 1em;
+}
 </style>
