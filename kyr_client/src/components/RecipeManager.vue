@@ -1,7 +1,7 @@
 <template>
   <div>
     <RecipeSearch />
-    <RecipeList v-bind:recipes="recipes" />
+    <RecipeList :recipes="recipes" @delete-recipe="deleteRecipe"/>
   </div>
 </template>
 
@@ -39,6 +39,17 @@ export default {
           ingredients: ["2x ingredient0"],
           preparation: ""}
       ]
+    }
+  },
+  methods: {
+    addRecipe: function() {
+      console.log("Recipe added.");
+    },
+    deleteRecipe: function(id) {
+      let index = this.recipes.findIndex(rec => rec.id == id);
+      if (index != -1) {
+        this.recipes.splice(index, 1);
+      }
     }
   },
   components: {
