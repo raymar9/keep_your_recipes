@@ -1,13 +1,14 @@
 <template>
   <div>
     <RecipeSearch />
-    <RecipeList :recipes="recipes" @delete-recipe="deleteRecipe"/>
+    <RecipeList :recipes="recipes"/>
   </div>
 </template>
 
 <script>
 import RecipeSearch from './RecipeSearch'
 import RecipeList from './RecipeList'
+import { EventBus } from '../recipe_event_bus'
 
 export default {
   name: 'RecipeManager',
@@ -42,19 +43,29 @@ export default {
     }
   },
   methods: {
-    addRecipe: function() {
-      console.log("Recipe added.");
-    },
     deleteRecipe: function(id) {
       let index = this.recipes.findIndex(rec => rec.id == id);
       if (index != -1) {
         this.recipes.splice(index, 1);
+      }
+    },
+    saveRecipe: function(recipe) {
+      if (recipe.id) {
+        // modified recipe
+        let index = this.recipes.findIndex(rec => rec.id == recipe.id);
+        if (index != -1) {
+          this.recipes[index] = recipe;
+        }
       }
     }
   },
   components: {
     RecipeSearch,
     RecipeList
+  },
+  created: function() {
+    EventBus.$on('delete-recipe', id => this.deleteRecipe(id));
+    EventBus.$on('save-recipe', recipe => this.saveRecipe(recipe));
   }
 }
 </script>

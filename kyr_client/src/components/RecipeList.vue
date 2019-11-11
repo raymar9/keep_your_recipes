@@ -3,13 +3,14 @@
     <div class="tile is-parent is-vertical">
       <RecipeListItem v-for="recipe in recipes" :key="recipe.id" :recipe="recipe" @show-overlay="showOverlay"></RecipeListItem>
     </div>
-    <RecipeOverlay :recipe="recipeOverlay" v-if="recipeOverlay" @hide-overlay="hideOverlay" @delete-recipe="deleteRecipe"/>
+    <RecipeOverlay :recipe="recipeOverlay" v-if="recipeOverlay" @hide-overlay="hideOverlay"/>
   </div>
 </template>
 
 <script>
 import RecipeListItem from './RecipeListItem'
 import RecipeOverlay from './RecipeOverlay'
+import { EventBus } from '../recipe_event_bus'
 
 export default {
   name: "RecipeList",
@@ -30,10 +31,12 @@ export default {
     hideOverlay: function() {
       this.recipeOverlay = undefined;
     },
-    deleteRecipe: function(event) {
+    deleteRecipe: function() {
       this.hideOverlay();
-      this.$emit('delete-recipe', event);
     }
+  },
+  created: function() {
+    EventBus.$on('delete-recipe', this.deleteRecipe);
   }
 }
 </script>

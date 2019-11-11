@@ -8,7 +8,7 @@
         <p class="modal-card-title">{{ recipe.title }}</p>
         <a class="icon" @click="toggleEditMode(true)"><i class="oi oi-pencil"></i></a>
         <a class="icon" @click="toggleDeletionConfirmation(true)"><i class="oi oi-trash"></i></a>
-        <a class="icon" @click="$emit('delete-recipe', recipe.id)" v-if="showDeletionConfirmation"><i class="oi oi-check"></i></a>
+        <a class="icon" @click="deleteRecipe" v-if="showDeletionConfirmation"><i class="oi oi-check"></i></a>
         <a class="icon" @click="toggleDeletionConfirmation(false)" v-if="showDeletionConfirmation"><i class="oi oi-x"></i></a>
       </header>
       <section class="modal-card-body">
@@ -53,7 +53,9 @@
 </template>
 
 <script>
-import { checkIngredient, checkTag } from "../recipe_model/recipe_utils";
+import { checkIngredient, checkTag } from "../recipe_model/recipe_utils"
+import { EventBus } from "../recipe_event_bus"
+
 export default {
   name: "RecipeOverlay",
   props: ["recipe"],
@@ -94,7 +96,10 @@ export default {
     },
     saveChanges: function() {
       this.toggleEditMode(false);
-      this.$emit('save-recipe', this.modifiedRecipe);
+      EventBus.$emit('save-recipe', this.modifiedRecipe);
+    },
+    deleteRecipe: function() {
+      EventBus.$emit('delete-recipe', this.recipe.id);
     }
   }
 }
