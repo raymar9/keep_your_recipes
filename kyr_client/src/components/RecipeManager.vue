@@ -50,12 +50,9 @@ export default {
       }
     },
     saveRecipe: function(recipe) {
-      if (recipe.id) {
-        // modified recipe
-        let index = this.recipes.findIndex(rec => rec.id == recipe.id);
-        if (index != -1) {
-          this.recipes[index] = recipe;
-        }
+      let index = this.recipes.findIndex(rec => rec.id == recipe.id);
+      if (index != -1) {
+        this.recipes[index] = recipe;
       }
     }
   },

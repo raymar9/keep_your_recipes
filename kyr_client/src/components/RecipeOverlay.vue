@@ -5,7 +5,7 @@
 
     <div class="modal-card" v-if="!showEditMode">
       <header class="modal-card-head">
-        <p class="modal-card-title">{{ recipe.title }}</p>
+        <p class="modal-card-title">{{ currentRecipe.title }}</p>
         <a class="icon" @click="toggleEditMode(true)"><i class="oi oi-pencil"></i></a>
         <a class="icon" @click="toggleDeletionConfirmation(true)"><i class="oi oi-trash"></i></a>
         <a class="icon" @click="deleteRecipe" v-if="showDeletionConfirmation"><i class="oi oi-check"></i></a>
@@ -13,38 +13,38 @@
       </header>
       <section class="modal-card-body">
         <div class="tags are-medium">
-          <span class="tag is-rounded" v-for="tag in recipe.tags" :key="tag.id">{{ tag }}</span>
+          <span class="tag is-rounded" v-for="tag in currentRecipe.tags" :key="tag.id">{{ tag }}</span>
         </div>
         <ul class="ingredients">
-          <li v-for="ingredient in recipe.ingredients" :key="ingredient.id">{{ ingredient }}</li>
+          <li v-for="ingredient in currentRecipe.ingredients" :key="ingredient.id">{{ ingredient }}</li>
         </ul>
-        <p class="preparation">{{ recipe.preparation }}</p>
+        <p class="preparation">{{ currentRecipe.preparation }}</p>
       </section>
       <footer class="modal-card-foot"></footer>
     </div>
 
     <div class="modal-card" v-else>
       <header class="modal-card-head">
-        <input class="modal-card-title" v-model="modifiedRecipe.title" placeholder="modifiedRecipe.title">
+        <input class="modal-card-title" v-model="currentRecipe.title" placeholder="currentRecipe.title">
         <a class="icon" @click="toggleEditMode(false)"><i class="oi oi-x"></i></a>
       </header>
       <section class="modal-card-body">
         <div class="tags are-medium">
-          <span class="tag is-rounded" v-for="(tag, index) in modifiedRecipe.tags" :key="tag.id">{{ tag }}
+          <span class="tag is-rounded" v-for="(tag, index) in currentRecipe.tags" :key="tag.id">{{ tag }}
             <span class="icon is-small" @click="removeTag(index)"><i class="oi oi-x"></i></span>
           </span>
           <span class="tag is-rounded"><input v-model="newTag" placeholder="Add new tag...">
           <span class="icon is-small" @click="addTag"><i class="oi oi-plus"></i></span></span>
         </div>
         <ul class="ingredients">
-          <li class="ingredient" v-for="(ingredient, index) in modifiedRecipe.ingredients" :key="ingredient.id">
+          <li class="ingredient" v-for="(ingredient, index) in currentRecipe.ingredients" :key="ingredient.id">
             <span class="icon is-small" @click="removeIngredient(index)"><i class="oi oi-x"></i></span>
             {{ ingredient }}
           </li>
           <li class="ingredient"><input v-model="newIngredient" placeholder="Add new ingredient...">
           <span class="icon is-small" @click="addIngredient"><i class="oi oi-plus"></i></span></li>
         </ul>
-        <textarea class="preparation" v-model="modifiedRecipe.preparation"></textarea>
+        <textarea class="preparation" v-model="currentRecipe.preparation"></textarea>
       </section>
       <footer class="modal-card-foot"><button class="button" @click="saveChanges">Save</button></footer>
     </div>
@@ -63,7 +63,7 @@ export default {
     return {
       showDeletionConfirmation: false,
       showEditMode: false,
-      modifiedRecipe: JSON.parse(JSON.stringify(this.recipe)),
+      currentRecipe: JSON.parse(JSON.stringify(this.recipe)),
       newTag: undefined,
       newIngredient: undefined
     }
@@ -77,26 +77,26 @@ export default {
     },
     addTag: function() {
       if (checkTag(this.newTag)) {
-        this.modifiedRecipe.tags.push(this.newTag.trim());
+        this.currentRecipe.tags.push(this.newTag.trim());
         this.newTag = undefined;
       }
     },
     removeTag: function(tagId) {
       console.log(tagId);
-      this.modifiedRecipe.tags.splice(tagId, 1);
+      this.currentRecipe.tags.splice(tagId, 1);
     },
     addIngredient: function() {
       if (checkIngredient(this.newIngredient)) {
-        this.modifiedRecipe.ingredients.push(this.newIngredient.trim());
+        this.currentRecipe.ingredients.push(this.newIngredient.trim());
         this.newIngredient = undefined;
       }
     },
     removeIngredient: function(ingredientId) {
-      this.modifiedRecipe.ingredients.splice(ingredientId, 1);
+      this.currentRecipe.ingredients.splice(ingredientId, 1);
     },
     saveChanges: function() {
       this.toggleEditMode(false);
-      EventBus.$emit('save-recipe', this.modifiedRecipe);
+      EventBus.$emit('save-recipe', this.currentRecipe);
     },
     deleteRecipe: function() {
       EventBus.$emit('delete-recipe', this.recipe.id);
