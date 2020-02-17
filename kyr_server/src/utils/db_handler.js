@@ -62,7 +62,7 @@ async function insertEntry(entry, collectionName) {
 async function removeEntrybyId(id, collectionName) {
     try {
         let coll = await getCollection_(collectionName);
-        let result = await coll.deleteOne(MongoDb.ObjectId.createFromHexString(id));
+        let result = await coll.deleteOne({_id: MongoDb.ObjectId.createFromHexString(id)});
         if (result.deletedCount != 1) {
             console.warn(`dbHandler RemoveWarning: ${result.deletedCount} have been deleted from database.`);
         } else {

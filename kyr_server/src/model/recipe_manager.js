@@ -112,10 +112,10 @@ function validatePartialRecipe(obj) {
                 validObj[key] = validateIngredients(obj[key]);
                 break;
             case 'preparation':
-                validObj[key] = isString(preparation) ? preparation.trim() : undefined;
+                validObj[key] = isString(obj[key]) ? obj[key].trim() : undefined;
                 break;
             case 'image':
-                validObj[key] = isString(image) ? image.trim() : undefined;
+                validObj[key] = isString(obj[key]) ? obj[key].trim() : undefined;
                 break;
         }
     }
