@@ -6,6 +6,7 @@
     <div class="modal-card" v-if="!showEditMode">
       <header class="modal-card-head">
         <p class="modal-card-title">{{ currentRecipe.title }}</p>
+        <p> {{ currentRecipe._id}} </p>
         <a class="icon" @click="toggleEditMode(true)"><i class="oi oi-pencil"></i></a>
         <a class="icon" @click="toggleDeletionConfirmation(true)"><i class="oi oi-trash"></i></a>
         <a class="icon" @click="deleteRecipe" v-if="showDeletionConfirmation"><i class="oi oi-check"></i></a>
@@ -99,7 +100,7 @@ export default {
       EventBus.$emit('save-recipe', this.currentRecipe);
     },
     deleteRecipe: function() {
-      EventBus.$emit('delete-recipe', this.recipe.id);
+      EventBus.$emit('delete-recipe', this.recipe._id);
     }
   }
 }

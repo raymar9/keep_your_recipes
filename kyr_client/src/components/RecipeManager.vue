@@ -20,15 +20,21 @@ export default {
   },
   methods: {
     deleteRecipe: function(id) {
-      let index = this.recipes.findIndex(rec => rec.id == id);
+      let index = this.recipes.findIndex(rec => rec._id == id);
       if (index != -1) {
         this.recipes.splice(index, 1);
+        restApi.deleteRecipe(id);
       }
     },
     saveRecipe: function(recipe) {
-      let index = this.recipes.findIndex(rec => rec.id == recipe.id);
+      let index = this.recipes.findIndex(rec => rec._id == recipe._id);
+      console.debug(index);
       if (index != -1) {
         this.recipes[index] = recipe;
+        restApi.updateRecipe(recipe);
+      } else {
+        this.recipes.push(recipe);
+        restApi.addNewRecipe(recipe);
       }
     }
   },
